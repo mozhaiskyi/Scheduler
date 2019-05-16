@@ -1,7 +1,9 @@
 package com.mmozhaiskyi.dataapi
 
 import com.mmozhaiskyi.dataapi.datastore.GroupDataStoreImpl
+import com.mmozhaiskyi.dataapi.datastore.TeacherDataStoreImpl
 import com.mmozhaiskyi.datastore.GroupDataStore
+import com.mmozhaiskyi.datastore.TeacherDataStore
 import org.koin.dsl.module
 import retrofit2.CallAdapter
 import retrofit2.Converter
@@ -14,6 +16,8 @@ object DataApiModule {
     operator fun invoke() = module {
 
         single<GroupDataStore.Remote> { GroupDataStoreImpl() }
+
+        single<TeacherDataStore.Remote> { TeacherDataStoreImpl() }
 
         single<CallAdapter.Factory> { RxJava2CallAdapterFactory.create() }
 

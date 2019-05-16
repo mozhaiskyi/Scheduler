@@ -1,6 +1,7 @@
 package com.mmozhaiskyi.dataapi
 
 import com.mmozhaiskyi.dataapi.model.GroupApiModel
+import com.mmozhaiskyi.dataapi.model.TeacherApiModel
 import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -8,7 +9,10 @@ import retrofit2.http.Query
 internal interface RozkladService {
 
     @GET("groups")
-    fun getGroupByQuery(@Query("search") query: String): Observable<GroupsResult>
+    fun getGroupsByQuery(@Query("search") query: String): Observable<GroupsResult>
+
+    @GET("teachers")
+    fun getTeachersByQuery(@Query("search") query: String): Observable<TeachersResult>
 
     companion object {
 
@@ -17,3 +21,5 @@ internal interface RozkladService {
 }
 
 internal data class GroupsResult(val data: List<GroupApiModel>)
+
+internal data class TeachersResult(val data: List<TeacherApiModel>)
