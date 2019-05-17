@@ -9,12 +9,14 @@ CREATE TABLE Lesson(
     name TEXT NOT NULL,
     fullName TEXT NOT NULL,
     lessonNumber INTEGER AS Short NOT NULL,
+    type TEXT NOT NULL,
+    weekNumber INTEGER AS Short NOT NULL,
     timeStart TEXT NOT NULL,
     timeEnd TEXT NOT NULL,
     rate INTEGER NOT NULL,
-    teacherIds TEXT AS List<String> NOT NULL,
+    teachersIds TEXT AS List<String> NOT NULL,
     groupsIds TEXT AS List<String> NOT NULL,
-    rommsIds TEXT AS List<String> NOT NULL
+    roomsIds TEXT AS List<String> NOT NULL
 );
 
 CREATE TABLE Group(
@@ -40,8 +42,8 @@ CREATE TABLE Room(
 );
 
 insertLesson:
-INSERT OR REPLACE INTO Lesson(id, dayNumber, day, name, fullName, lessonNumber, timeStart, timeEnd, rate, teacherIds, groupsIds, rommsIds)
-VALUES (?,?,?,?,?,?,?,?,?,?,?,?);
+INSERT OR REPLACE INTO Lesson(id, dayNumber, day, name, fullName, lessonNumber, type, weekNumber, timeStart, timeEnd, rate, teachersIds, groupsIds, roomsIds)
+VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);
 
 insertTeacher:
 INSERT OR REPLACE INTO Teacher(id, name, fullName, shortName, rating)
@@ -59,7 +61,7 @@ getLessonsByGroupId:
 SELECT * FROM Lesson WHERE groupsIds LIKE ?;
 
 getLessonsByTeacherId:
-SELECT * FROM Lesson WHERE teacherIds LIKE ?;
+SELECT * FROM Lesson WHERE teachersIds LIKE ?;
 
 getTeachersByIds:
 SELECT * FROM Teacher WHERE id IN ?;

@@ -6,8 +6,10 @@ import com.mmozhaiskyi.datadb.dao.GroupDao
 import com.mmozhaiskyi.datadb.dao.LessonDao
 import com.mmozhaiskyi.datadb.dao.RoomDao
 import com.mmozhaiskyi.datadb.dao.TeacherDao
+import com.mmozhaiskyi.datadb.datastore.LessonDataStoreImpl
 import com.mmozhaiskyi.datadb.db.DbCallback
 import com.mmozhaiskyi.datadb.db.IdsAdapter
+import com.mmozhaiskyi.datastore.LessonDataStore
 import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.android.AndroidSqliteDriver
 import org.koin.dsl.module
@@ -45,5 +47,7 @@ object DataDbModule {
         single { RoomDao() }
 
         single { LessonDao() }
+
+        single<LessonDataStore.Cache> { LessonDataStoreImpl() }
     }
 }

@@ -1,9 +1,16 @@
 package com.mmozhaiskyi.datadb.dao
 
 import com.mmozhaiskyi.datadb.SchedulerQueries
+import com.mmozhaiskyi.model.Group
 import com.mmozhaiskyi.model.Lesson
+import com.mmozhaiskyi.model.Room
+import com.mmozhaiskyi.model.Teacher
+import com.squareup.sqldelight.runtime.rx.asObservable
+import com.squareup.sqldelight.runtime.rx.mapToList
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.functions.Function3
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -40,10 +47,10 @@ internal class LessonDao : KoinComponent {
             }
         }
 
-    fun delete(id: String) = Completable
+    fun delete(lesson: Lesson) = Completable
         .create { e ->
             try {
-                queries.deleteLesson(id)
+                deleteSync(lesson)
 
                 e.onComplete()
             } catch (t: Throwable) {
@@ -51,11 +58,11 @@ internal class LessonDao : KoinComponent {
             }
         }
 
-    fun delete(ids: List<String>) = Completable
+    fun delete(lessons: List<Lesson>) = Completable
         .create { e ->
             try {
                 queries.transaction {
-                    ids.forEach { id -> queries.deleteLesson(id) }
+                    lessons.forEach { lesson -> deleteSync(lesson) }
                 }
 
                 e.onComplete()
@@ -65,11 +72,62 @@ internal class LessonDao : KoinComponent {
         }
 
     fun getAllByGroupId(groupId: String): Observable<List<Lesson>> {
-        val q = queries.
+
+        val q = queries.getLessonsByGroupId(":$groupId:")
+
+        return q.asObservable()
+            .mapToList()
+            .flatMapSingle { models -> combineFetch(models) }
     }
 
     fun getAllByTeacherId(teacherId: String): Observable<List<Lesson>> {
 
+        val q = queries.getLessonsByTeacherId(":$teacherId:")
+
+        return q.asObservable()
+            .mapToList()
+            .flatMapSingle { models -> combineFetch(models) }
+    }
+
+    private fun combineFetch(fetched: List<com.mmozhaiskyi.datadb.Lesson>): Single<List<Lesson>> {
+        return Observable.fromIterable(fetched)
+            .flatMap { model ->
+                val zipper = Function3 { groups: List<Group>, teachers: List<Teacher>, rooms: List<Room> ->
+                    with(model) {
+                        Lesson(
+                            id,
+                            dayNumber,
+                            day,
+                            name,
+                            fullName,
+                            lessonNumber,
+                            type,
+                            weekNumber,
+                            timeStart,
+                            timeEnd,
+                            rate.toInt(),
+                            teachers,
+                            groups,
+                            rooms
+                        )
+                    }
+                }
+                Observable.zip(
+                    groupDao.getAllByIds(model.groupsIds),
+                    teacherDao.getAllByIds(model.teachersIds),
+                    roomDao.getAllByIds(model.roomsIds),
+                    zipper
+                )
+            }
+            .toList()
+    }
+
+    private fun deleteSync(lesson: Lesson) {
+        queries.deleteLesson(lesson.id)
+
+        groupDao.deleteSync(lesson.groups.map { it.id })
+        teacherDao.deleteSync(lesson.teachers.map { it.id })
+        roomDao.deleteSync(lesson.rooms.map { it.id })
     }
 
     private fun insertSync(lesson: Lesson) {
@@ -81,6 +139,8 @@ internal class LessonDao : KoinComponent {
                 name,
                 fullName,
                 lessonNumber,
+                type,
+                weekNumber,
                 timeStart,
                 timeEnd,
                 rate.toLong(),
@@ -88,6 +148,10 @@ internal class LessonDao : KoinComponent {
                 groups.map { it.id },
                 rooms.map { it.id }
             )
+
+            teachers.forEach { teacher -> teacherDao.insertSync(teacher) }
+            groups.forEach { group -> groupDao.insertSync(group) }
+            rooms.forEach { room -> roomDao.insertSync(room) }
         }
     }
 }
