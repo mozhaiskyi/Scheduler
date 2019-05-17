@@ -1,8 +1,8 @@
 package com.mmozhaiskyi.domain
 
 import com.mmozhaiskyi.model.Group
+import com.mmozhaiskyi.model.Lesson
 import com.mmozhaiskyi.model.Teacher
-
 val teachers = listOf(
     Teacher(
         "1",
@@ -38,5 +38,24 @@ val groups = listOf(
         "pi-71",
         "mas",
         "day"
+    )
+)
+
+val lessons = listOf(
+    Lesson(
+        "1",
+        3,
+        "Sunday",
+        "Something like a shit",
+        "",
+        3,
+        "Workshop",
+        1,
+        "12.00.00",
+        "13.40.00",
+        1,
+        listOf(),
+        listOf(),
+        listOf()
     )
 )

@@ -1,6 +1,6 @@
 package com.mmozhaiskyi.dataapi
 
-import com.mmozhaiskyi.datastore.LessonsDataStore
+import com.mmozhaiskyi.datastore.LessonDataStore
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -11,7 +11,7 @@ import org.koin.test.inject
 
 class LessonDataStoreTest : KoinTest {
 
-    private val lessonDataStore: LessonsDataStore.Remote by inject()
+    private val lessonDataStore: LessonDataStore.Remote by inject()
 
     private val testGroupId = "4666"
     private val testTeacherId = "3232"

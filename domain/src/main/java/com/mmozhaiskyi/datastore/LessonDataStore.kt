@@ -4,7 +4,7 @@ import com.mmozhaiskyi.model.Lesson
 import io.reactivex.Completable
 import io.reactivex.Observable
 
-interface LessonsDataStore {
+interface LessonDataStore {
 
     interface Remote {
 

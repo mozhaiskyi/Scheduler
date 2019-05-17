@@ -1,13 +1,13 @@
 package com.mmozhaiskyi.dataapi.datastore
 
 import com.mmozhaiskyi.dataapi.RozkladService
-import com.mmozhaiskyi.datastore.LessonsDataStore
+import com.mmozhaiskyi.datastore.LessonDataStore
 import com.mmozhaiskyi.model.Lesson
 import io.reactivex.Observable
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
-internal class LessonDataStoreImpl : LessonsDataStore.Remote, KoinComponent {
+internal class LessonDataStoreImpl : LessonDataStore.Remote, KoinComponent {
 
     private val service: RozkladService by inject()
 
