@@ -3,7 +3,7 @@ package com.mmozhaiskyi.dataapi
 import com.mmozhaiskyi.dataapi.model.GroupApiModel
 import com.mmozhaiskyi.dataapi.model.LessonApiModel
 import com.mmozhaiskyi.dataapi.model.TeacherApiModel
-import io.reactivex.Observable
+import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -11,16 +11,16 @@ import retrofit2.http.Query
 internal interface RozkladService {
 
     @GET("groups")
-    fun getGroupsByQuery(@Query("search") query: String): Observable<GroupsResult>
+    fun getGroupsByQuery(@Query("search") query: String): Single<GroupsResult>
 
     @GET("teachers")
-    fun getTeachersByQuery(@Query("search") query: String): Observable<TeachersResult>
+    fun getTeachersByQuery(@Query("search") query: String): Single<TeachersResult>
 
     @GET("groups/{groupId}/lessons")
-    fun getLessonsByGroup(@Path("groupId") groupId: String): Observable<LessonsResult>
+    fun getLessonsByGroup(@Path("groupId") groupId: String): Single<LessonsResult>
 
     @GET("teachers/{teacherId}/lessons")
-    fun getLessonByTeacher(@Path("teacherId") teacherId: String): Observable<LessonsResult>
+    fun getLessonByTeacher(@Path("teacherId") teacherId: String): Single<LessonsResult>
 
     companion object {
 

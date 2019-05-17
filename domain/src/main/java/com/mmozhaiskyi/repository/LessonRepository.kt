@@ -2,19 +2,19 @@ package com.mmozhaiskyi.repository
 
 import com.mmozhaiskyi.datastore.LessonDataStore
 import com.mmozhaiskyi.model.Lesson
-import io.reactivex.Observable
+import io.reactivex.Single
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
 interface LessonRepository {
 
-    fun getLessonsByGroup(groupId: String): Observable<List<Lesson>>
+    fun getLessonsByGroup(groupId: String): Single<List<Lesson>>
 
-    fun updateLessonsByGroup(groupId: String): Observable<List<Lesson>>
+    fun updateLessonsByGroup(groupId: String): Single<List<Lesson>>
 
-    fun getLessonsByTeacher(teacherId: String): Observable<List<Lesson>>
+    fun getLessonsByTeacher(teacherId: String): Single<List<Lesson>>
 
-    fun updateLessonsByTeacher(teacherId: String): Observable<List<Lesson>>
+    fun updateLessonsByTeacher(teacherId: String): Single<List<Lesson>>
 }
 
 internal class LessonRepositoryImpl : LessonRepository, KoinComponent {
@@ -22,15 +22,15 @@ internal class LessonRepositoryImpl : LessonRepository, KoinComponent {
     private val remote: LessonDataStore.Remote by inject()
     private val cache: LessonDataStore.Cache by inject()
 
-    override fun getLessonsByGroup(groupId: String): Observable<List<Lesson>> {
+    override fun getLessonsByGroup(groupId: String): Single<List<Lesson>> {
         return cache.getLessonsByGroup(groupId)
             .flatMap { cached ->
                 if (cached.isEmpty()) updateLessonsByGroup(groupId)
-                else Observable.just(cached)
+                else Single.just(cached)
             }
     }
 
-    override fun updateLessonsByGroup(groupId: String): Observable<List<Lesson>> {
+    override fun updateLessonsByGroup(groupId: String): Single<List<Lesson>> {
         return remote.getLessonsByGroup(groupId)
             .flatMap { fetched ->
                 val clearCache = cache.deleteLessonsByGroup(groupId)
@@ -38,19 +38,19 @@ internal class LessonRepositoryImpl : LessonRepository, KoinComponent {
 
                 return@flatMap clearCache
                     .andThen(saveToCache)
-                    .andThen(Observable.just(fetched))
+                    .andThen(Single.just(fetched))
             }
     }
 
-    override fun getLessonsByTeacher(teacherId: String): Observable<List<Lesson>> {
+    override fun getLessonsByTeacher(teacherId: String): Single<List<Lesson>> {
         return cache.getLessonsByTeacher(teacherId)
             .flatMap { cached ->
                 if (cached.isEmpty()) updateLessonsByTeacher(teacherId)
-                else Observable.just(cached)
+                else Single.just(cached)
             }
     }
 
-    override fun updateLessonsByTeacher(teacherId: String): Observable<List<Lesson>> {
+    override fun updateLessonsByTeacher(teacherId: String): Single<List<Lesson>> {
         return remote.getLessonsByTeacher(teacherId)
             .flatMap { fetched ->
                 val clearCache = cache.deleteLessonsByTeacher(teacherId)
@@ -58,7 +58,7 @@ internal class LessonRepositoryImpl : LessonRepository, KoinComponent {
 
                 return@flatMap clearCache
                     .andThen(saveToCache)
-                    .andThen(Observable.just(fetched))
+                    .andThen(Single.just(fetched))
             }
     }
 }

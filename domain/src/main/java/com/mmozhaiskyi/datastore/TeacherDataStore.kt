@@ -1,12 +1,12 @@
 package com.mmozhaiskyi.datastore
 
 import com.mmozhaiskyi.model.Teacher
-import io.reactivex.Observable
+import io.reactivex.Single
 
 interface TeacherDataStore {
 
     interface Remote {
 
-        fun getTeachersByQuery(query: String): Observable<List<Teacher>>
+        fun getTeachersByQuery(query: String): Single<List<Teacher>>
     }
 }

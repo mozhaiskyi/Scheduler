@@ -5,6 +5,7 @@ import com.mmozhaiskyi.model.Teacher
 import com.mmozhaiskyi.repository.GroupRepository
 import com.mmozhaiskyi.repository.TeacherRepository
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -25,11 +26,11 @@ class SearchUseCase : KoinComponent {
     fun search(query: Observable<String>): Observable<List<SearchResult>> = query
         .filter { it.isNotBlank() }
         .debounce(300, TimeUnit.MILLISECONDS)
-        .switchMap { q ->
+        .switchMapSingle { q ->
             val zipper = BiFunction { groups: List<Group>, teachers: List<Teacher> ->
                 groups.map(SearchResult::GroupResult) + teachers.map(SearchResult::TeacherResult)
             }
-            Observable.zip(
+            Single.zip(
                 groupRepository.getGroupsByQuery(q),
                 teacherRepository.getTeacherByQuery(q),
                 zipper

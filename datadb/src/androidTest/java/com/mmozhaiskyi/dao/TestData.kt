@@ -1,4 +1,4 @@
-package com.mmozhaiskyi.domain
+package com.mmozhaiskyi.dao
 
 import com.mmozhaiskyi.model.Group
 import com.mmozhaiskyi.model.Lesson
@@ -55,8 +55,8 @@ val lessons = listOf(
         "12.00.00",
         "13.40.00",
         1,
-        listOf(),
-        listOf(),
+        teachers,
+        groups,
         listOf()
     )
 )
