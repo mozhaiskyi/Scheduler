@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'com.squareup.sqldelight'
+
 apply from: "../versions.gradle"
 
 android {
@@ -16,17 +18,21 @@ android {
         versionCode 1
         versionName "1.0"
 
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
     }
 }
 
 dependencies {
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation project(":domain")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.koin:koin-android:$versions.koin"
     implementation "io.reactivex.rxjava2:rxjava:$versions.rxJava"
 
-    testImplementation "junit:junit:$versions.junit"
-    testImplementation "org.koin:koin-test:$versions.koin"
-    testImplementation "com.nhaarman:mockito-kotlin:$versions.mockito"
+    implementation "com.squareup.sqldelight:android-driver:$versions.sqlDelight"
+    implementation "com.squareup.sqldelight:rxjava2-extensions:$versions.sqlDelight"
 }

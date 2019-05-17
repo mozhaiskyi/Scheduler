@@ -1,0 +1,83 @@
+import java.lang.Short;
+import java.lang.String;
+import kotlin.collection.List;
+
+CREATE TABLE Lesson(
+    id TEXT NOT NULL,
+    dayNumber INTEGER AS Short NOT NULL,
+    day TEXT NOT NULL,
+    name TEXT NOT NULL,
+    fullName TEXT NOT NULL,
+    lessonNumber INTEGER AS Short NOT NULL,
+    timeStart TEXT NOT NULL,
+    timeEnd TEXT NOT NULL,
+    rate INTEGER NOT NULL,
+    teacherIds TEXT AS List<String> NOT NULL,
+    groupsIds TEXT AS List<String> NOT NULL,
+    rommsIds TEXT AS List<String> NOT NULL
+);
+
+CREATE TABLE Group(
+    id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    okr TEXT NOT NULL,
+    type TEXT NOT NULL
+);
+
+CREATE TABLE Teacher(
+    id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    fullName TEXT NOT NULL,
+    shortName TEXT NOT NULL,
+    rating REAL NOT NULL
+);
+
+CREATE TABLE Room(
+    id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    latitude REAL NOT NULL,
+    longitude REAL NOT NULL
+);
+
+insertLesson:
+INSERT OR REPLACE INTO Lesson(id, dayNumber, day, name, fullName, lessonNumber, timeStart, timeEnd, rate, teacherIds, groupsIds, rommsIds)
+VALUES (?,?,?,?,?,?,?,?,?,?,?,?);
+
+insertTeacher:
+INSERT OR REPLACE INTO Teacher(id, name, fullName, shortName, rating)
+VALUES (?,?,?,?,?);
+
+insertRoom:
+INSERT OR REPLACE INTO Room(id, name, latitude, longitude)
+VALUES (?,?,?,?);
+
+insertGroup:
+INSERT OR REPLACE INTO Group(id, name, okr, type)
+VALUES (?,?,?,?);
+
+getLessonsByGroupId:
+SELECT * FROM Lesson WHERE groupsIds LIKE ?;
+
+getLessonsByTeacherId:
+SELECT * FROM Lesson WHERE teacherIds LIKE ?;
+
+getTeachersByIds:
+SELECT * FROM Teacher WHERE id IN ?;
+
+getRoomsByIds:
+SELECT * FROM Room WHERE id IN ?;
+
+getGroupsByIds:
+SELECT * FROM Group WHERE id IN ?;
+
+deleteLesson:
+DELETE FROM Lesson WHERE id = ?;
+
+deleteTeacherByIds:
+DELETE FROM Teacher WHERE id IN ?;
+
+deleteRoomByIds:
+DELETE FROM Room WHERE id IN ?;
+
+deleteGroupsByIds:
+DELETE FROM Group WHERE id IN ?;
