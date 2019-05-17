@@ -2,9 +2,6 @@ package com.mmozhaiskyi.datadb.dao
 
 import com.mmozhaiskyi.datadb.SchedulerQueries
 import com.mmozhaiskyi.model.Teacher
-import com.squareup.sqldelight.runtime.rx.asObservable
-import com.squareup.sqldelight.runtime.rx.mapToList
-import io.reactivex.Observable
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -22,11 +19,10 @@ internal class TeacherDao : KoinComponent {
         queries.deleteTeacherByIds(ids)
     }
 
-    fun getAllByIds(ids: List<String>): Observable<List<Teacher>> {
+    fun getAllByIds(ids: List<String>): List<Teacher> {
 
         val q = queries.getTeachersByIds(ids, ::Teacher)
 
-        return q.asObservable()
-            .mapToList()
+        return q.executeAsList()
     }
 }

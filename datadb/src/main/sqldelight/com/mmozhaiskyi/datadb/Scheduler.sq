@@ -1,9 +1,9 @@
 import java.lang.Short;
 import java.lang.String;
-import kotlin.collection.List;
+import kotlin.collections.List;
 
-CREATE TABLE Lesson(
-    id TEXT NOT NULL,
+CREATE TABLE Lesson (
+    id TEXT NOT NULL PRIMARY KEY,
     dayNumber INTEGER AS Short NOT NULL,
     day TEXT NOT NULL,
     name TEXT NOT NULL,
@@ -19,23 +19,23 @@ CREATE TABLE Lesson(
     roomsIds TEXT AS List<String> NOT NULL
 );
 
-CREATE TABLE Group(
-    id TEXT NOT NULL,
+CREATE TABLE StudentGroup (
+    id TEXT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     okr TEXT NOT NULL,
     type TEXT NOT NULL
 );
 
-CREATE TABLE Teacher(
-    id TEXT NOT NULL,
+CREATE TABLE Teacher (
+    id TEXT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     fullName TEXT NOT NULL,
     shortName TEXT NOT NULL,
     rating REAL NOT NULL
 );
 
-CREATE TABLE Room(
-    id TEXT NOT NULL,
+CREATE TABLE Room (
+    id TEXT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     latitude REAL NOT NULL,
     longitude REAL NOT NULL
@@ -54,7 +54,7 @@ INSERT OR REPLACE INTO Room(id, name, latitude, longitude)
 VALUES (?,?,?,?);
 
 insertGroup:
-INSERT OR REPLACE INTO Group(id, name, okr, type)
+INSERT OR REPLACE INTO StudentGroup(id, name, okr, type)
 VALUES (?,?,?,?);
 
 getLessonsByGroupId:
@@ -70,7 +70,7 @@ getRoomsByIds:
 SELECT * FROM Room WHERE id IN ?;
 
 getGroupsByIds:
-SELECT * FROM Group WHERE id IN ?;
+SELECT * FROM StudentGroup WHERE id IN ?;
 
 deleteLesson:
 DELETE FROM Lesson WHERE id = ?;
@@ -82,4 +82,16 @@ deleteRoomByIds:
 DELETE FROM Room WHERE id IN ?;
 
 deleteGroupsByIds:
-DELETE FROM Group WHERE id IN ?;
+DELETE FROM StudentGroup WHERE id IN ?;
+
+clearLessons:
+DELETE FROM Lesson;
+
+clearGroups:
+DELETE FROM StudentGroup;
+
+clearTeachers:
+DELETE FROM Teacher;
+
+clearRooms:
+DELETE FROM Room;

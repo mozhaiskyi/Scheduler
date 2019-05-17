@@ -15,6 +15,6 @@ class IdsAdapter : ColumnAdapter<List<String>, String> {
 
     companion object {
 
-        private const val SEPARATOR = ":"
+        private const val SEPARATOR = "-"
     }
 }

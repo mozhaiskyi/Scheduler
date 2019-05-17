@@ -1,16 +1,10 @@
 package com.mmozhaiskyi.datadb.dao
 
+import androidx.annotation.VisibleForTesting
 import com.mmozhaiskyi.datadb.SchedulerQueries
-import com.mmozhaiskyi.model.Group
 import com.mmozhaiskyi.model.Lesson
-import com.mmozhaiskyi.model.Room
-import com.mmozhaiskyi.model.Teacher
-import com.squareup.sqldelight.runtime.rx.asObservable
-import com.squareup.sqldelight.runtime.rx.mapToList
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.functions.Function3
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -22,35 +16,12 @@ internal class LessonDao : KoinComponent {
     private val teacherDao: TeacherDao by inject()
     private val roomDao: RoomDao by inject()
 
-    fun insert(lesson: Lesson) = Completable
-        .create { e ->
-            try {
-                insertSync(lesson)
-
-                e.onComplete()
-            } catch (t: Throwable) {
-                e.onError(t)
-            }
-
-        }
-
     fun insert(lessons: List<Lesson>) = Completable
         .create { e ->
             try {
                 queries.transaction {
                     lessons.forEach { lesson -> insertSync(lesson) }
                 }
-
-                e.onComplete()
-            } catch (t: Throwable) {
-                e.onError(t)
-            }
-        }
-
-    fun delete(lesson: Lesson) = Completable
-        .create { e ->
-            try {
-                deleteSync(lesson)
 
                 e.onComplete()
             } catch (t: Throwable) {
@@ -71,55 +42,72 @@ internal class LessonDao : KoinComponent {
             }
         }
 
-    fun getAllByGroupId(groupId: String): Observable<List<Lesson>> {
+    fun getAllByGroupId(groupId: String) = Single.create<List<Lesson>> { e ->
 
-        val q = queries.getLessonsByGroupId(":$groupId:")
+        val q = queries.getLessonsByGroupId("%-$groupId-%")
 
-        return q.asObservable()
-            .mapToList()
-            .flatMapSingle { models -> combineFetch(models) }
+        try {
+            val fetched = q.executeAsList()
+            val result = combineFetch(fetched)
+            e.onSuccess(result)
+        } catch (t: Throwable) {
+            e.onError(t)
+        }
     }
 
-    fun getAllByTeacherId(teacherId: String): Observable<List<Lesson>> {
+    fun getAllByTeacherId(teacherId: String) = Single.create<List<Lesson>> { e ->
 
-        val q = queries.getLessonsByTeacherId(":$teacherId:")
+        val q = queries.getLessonsByTeacherId("%-$teacherId-%")
 
-        return q.asObservable()
-            .mapToList()
-            .flatMapSingle { models -> combineFetch(models) }
+        try {
+            val fetched = q.executeAsList()
+            val result = combineFetch(fetched)
+            e.onSuccess(result)
+        } catch (t: Throwable) {
+            e.onError(t)
+        }
     }
 
-    private fun combineFetch(fetched: List<com.mmozhaiskyi.datadb.Lesson>): Single<List<Lesson>> {
-        return Observable.fromIterable(fetched)
-            .flatMap { model ->
-                val zipper = Function3 { groups: List<Group>, teachers: List<Teacher>, rooms: List<Room> ->
-                    with(model) {
-                        Lesson(
-                            id,
-                            dayNumber,
-                            day,
-                            name,
-                            fullName,
-                            lessonNumber,
-                            type,
-                            weekNumber,
-                            timeStart,
-                            timeEnd,
-                            rate.toInt(),
-                            teachers,
-                            groups,
-                            rooms
-                        )
-                    }
-                }
-                Observable.zip(
-                    groupDao.getAllByIds(model.groupsIds),
+    @VisibleForTesting fun clear() = Completable.create { e ->
+        try {
+            val clearProcesses = listOf(
+                queries::clearLessons,
+                queries::clearGroups,
+                queries::clearTeachers,
+                queries::clearRooms
+            )
+
+            queries.transaction {
+                clearProcesses.forEach { it.invoke() }
+            }
+
+            e.onComplete()
+        } catch (t: Throwable) {
+            e.onError(t)
+        }
+    }
+
+    private fun combineFetch(fetched: List<com.mmozhaiskyi.datadb.Lesson>): List<Lesson> {
+        return fetched.map { model ->
+            with(model) {
+                Lesson(
+                    id,
+                    dayNumber,
+                    day,
+                    name,
+                    fullName,
+                    lessonNumber,
+                    type,
+                    weekNumber,
+                    timeStart,
+                    timeEnd,
+                    rate.toInt(),
                     teacherDao.getAllByIds(model.teachersIds),
-                    roomDao.getAllByIds(model.roomsIds),
-                    zipper
+                    groupDao.getAllByIds(model.groupsIds),
+                    roomDao.getAllByIds(model.roomsIds)
                 )
             }
-            .toList()
+        }
     }
 
     private fun deleteSync(lesson: Lesson) {

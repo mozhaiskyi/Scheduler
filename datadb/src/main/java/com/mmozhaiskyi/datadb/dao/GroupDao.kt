@@ -2,9 +2,6 @@ package com.mmozhaiskyi.datadb.dao
 
 import com.mmozhaiskyi.datadb.SchedulerQueries
 import com.mmozhaiskyi.model.Group
-import com.squareup.sqldelight.runtime.rx.asObservable
-import com.squareup.sqldelight.runtime.rx.mapToList
-import io.reactivex.Observable
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -22,11 +19,10 @@ internal class GroupDao : KoinComponent {
         queries.deleteGroupsByIds(ids)
     }
 
-    fun getAllByIds(ids: List<String>): Observable<List<Group>> {
+    fun getAllByIds(ids: List<String>): List<Group> {
 
         val q = queries.getGroupsByIds(ids, ::Group)
 
-        return q.asObservable()
-            .mapToList()
+        return q.executeAsList()
     }
 }
